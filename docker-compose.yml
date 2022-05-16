@@ -1,0 +1,46 @@
+version: '3.9'
+services:
+  prometheus:
+    image: prom/prometheus:$PROMETHEUS_VERSION
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    links:
+      - "metrics-app:metrics-app"
+    depends_on:
+      - metrics-app
+  grafana:
+    image: grafana/grafana:$GRAFANA_VERSION
+    environment:
+      GF_SECURITY_ADMIN_USER: $GRAFANA_ADMIN_USER
+      GF_SECURITY_ADMIN_PASSWORD: $GRAFANA_ADMIN_PASSWORD
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana-prometheus-datasource.yml:/etc/grafana/provisioning/datasources/default.yaml
+      - grafana-data:/var/lib/grafana  
+    links:
+      - "prometheus:prometheus"
+    depends_on:
+      - prometheus
+  metrics-app:
+    build:
+      context: .
+      dockerfile: Dockerfile-MetricsApp
+    ports:
+      - 8080:8080
+  jmeter:
+    image: justb4/jmeter
+    command: -n -t /jmeter-tests.jmx
+    volumes:
+      - ./jmeter-tests.jmx:/jmeter-tests.jmx
+    links:
+      - "metrics-app:metrics-app"
+    depends_on:
+      - metrics-app    
+
+volumes:
+  prometheus-data:
+  grafana-data:
