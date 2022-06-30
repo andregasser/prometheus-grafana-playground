@@ -34,4 +34,9 @@ This application is used for load testing in general. In our context, we use it 
 - This git repository checked out on your machine
 
 ## Starting Up
-Run `docker-compose build && docker-compose up` from the root folder of the git repositry. The playground will be built (source code compiled, containers launched). After the build stage, JMeter will start to request the movies API. You can now go into Grafana and start playing around with it.
+From the root folder of the git directory, first run a `docker-compose build` to build all the images. Then run `docker-compose up -d` to launch all the containers. Use `docker-compose ps`to verify that all containers are up and running. As soon as all the containers are up, JMeter will start to request the movies API. You can now go into Grafana and start playing around with it.
+
+## Some Tips
+
+### Alerts
+Go to https://www.requestbin.com and create a new public WebHook endpoint. Use that URL to configure alerting in Grafana.
